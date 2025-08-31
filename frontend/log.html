@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi Log Viewer</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --primary-dark: #1a237e;
+      --primary: #283593;
+      --primary-light: #3949ab;
+      --secondary: #03a9f4;
+      --accent: #00bcd4;
+      --terminal-bg: #121212;
+      --terminal-text: #4caf50;
+      --terminal-border: #333;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    
+    .navbar {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .navbar-brand {
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    
+    .sidebar {
+      height: calc(100vh - 56px);
+      background-color: #ffffff;
+      padding-top: 20px;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+    }
+    
+    .sidebar-header {
+      padding: 0 15px 15px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .sidebar .nav-link {
+      padding: 12px 20px;
+      margin: 5px 15px;
+      border-radius: 8px;
+      color: #555;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+    }
+    
+    .sidebar .nav-link:hover {
+      background-color: #f0f4f8;
+      color: var(--primary);
+      transform: translateX(5px);
+    }
+    
+    .sidebar .nav-link.active {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: #fff !important;
+      box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+    }
+    
+    .sidebar .nav-link i {
+      margin-right: 10px;
+      font-size: 1.1rem;
+    }
+    
+    .main-content {
+      height: calc(100vh - 56px);
+      padding: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .log-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin: 0;
+    }
+    
+    .log-status {
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    .status-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #ccc;
+      margin-right: 8px;
+      animation: pulse 2s infinite;
+    }
+    
+    .status-indicator.active {
+      background-color: #4caf50;
+    }
+    
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 6px rgba(76, 175, 80, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+      }
+    }
+    
+    .log-container {
+      flex-grow: 1;
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    #log {
+      background: var(--terminal-bg);
+      color: var(--terminal-text);
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      padding: 15px;
+      height: 100%;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      border: none;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    #log::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    #log::-webkit-scrollbar-track {
+      background: #1e1e1e;
+    }
+    
+    #log::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 4px;
+    }
+    
+    #log::-webkit-scrollbar-thumb:hover {
+      background: #777;
+    }
+    
+    .refresh-btn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--secondary);
+      color: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+    
+    .refresh-btn:hover {
+      background-color: var(--accent);
+      transform: scale(1.1);
+    }
+    
+    .refresh-btn i {
+      font-size: 1.2rem;
+    }
+    
+    .refresh-btn.rotating i {
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .timestamp {
+      color: #9e9e9e;
+      margin-right: 8px;
+    }
+    
+    .log-info {
+      color: #2196f3;
+    }
+    
+    .log-warning {
+      color: #ff9800;
+    }
+    
+    .log-error {
+      color: #f44336;
+    }
+    
+    .log-success {
+      color: #4caf50;
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        height: auto;
+        position: relative;
+        width: 100%;
+      }
+      
+      .main-content {
+        height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">
+        <i class="bi bi-terminal-fill me-2"></i>Live Log Viewer
+      </span>
+      <div class="d-flex align-items-center">
+        <span class="text-white me-3" id="currentTime"></span>
+        <span class="badge bg-light text-dark" id="updateStatus">Updated just now</span>
+      </div>
+    </div>
+  </nav>
+  
+  <div class="container-fluid p-0">
+    <div class="row g-0">
+      <!-- Sidebar -->
+      <div class="col-md-3 col-lg-2 sidebar">
+        <div class="sidebar-header">
+          <h6 class="mb-0 text-muted">LOG CATEGORIES</h6>
+        </div>
+        <nav class="nav flex-column">
+          <a class="nav-link log-link active" href="#" data-log="sensor">
+            <i class="bi bi-cpu"></i> Log Sensor
+          </a>
+          <a class="nav-link log-link" href="#" data-log="web">
+            <i class="bi bi-globe"></i> Log Web
+          </a>
+          <a class="nav-link log-link" href="#" data-log="send">
+            <i class="bi bi-send"></i> Log Send
+          </a>
+          <a class="nav-link log-link" href="#" data-log="retry">
+            <i class="bi bi-arrow-repeat"></i> Log Retry
+          </a>
+          <a class="nav-link log-link" href="#" data-log="backup">
+            <i class="bi bi-archive"></i> Log Backup
+          </a>
+        </nav>
+      </div>
+      
+      <!-- Main Content -->
+      <div class="col-md-9 col-lg-10 main-content">
+        <div class="log-header">
+          <h4 class="log-title" id="logTitle">
+            <i class="bi bi-cpu me-2"></i>Viewing: Log Sensor
+          </h4>
+          <div class="log-status">
+            <div class="status-indicator active" id="statusIndicator"></div>
+            <span id="statusText">Connected</span>
+          </div>
+        </div>
+        
+        <div class="log-container">
+          <div id="log"></div>
+          <button class="refresh-btn" id="refreshBtn" title="Refresh logs">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentLog = 'sensor';
+    let isFetching = false;
+    let lastUpdated = new Date();
+    
+    // Update current time
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('currentTime').textContent = now.toLocaleTimeString();
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+    
+    // Format log content with colors
+    function formatLogContent(logs) {
+      return logs.map(log => {
+        // Add timestamp formatting
+        log = log.replace(/(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/g, '<span class="timestamp">$1</span>');
+        
+        // Add color coding for log levels
+        log = log.replace(/\b(INFO)\b/g, '<span class="log-info">[$1]</span>');
+        log = log.replace(/\b(WARN|WARNING)\b/g, '<span class="log-warning">[$1]</span>');
+        log = log.replace(/\b(ERROR)\b/g, '<span class="log-error">[$1]</span>');
+        log = log.replace(/\b(SUCCESS)\b/g, '<span class="log-success">[$1]</span>');
+        
+        return log;
+      }).join('<br>');
+    }
+    
+    function fetchLogs(manualRefresh = false) {
+      if (!currentLog || isFetching) return;
+      
+      isFetching = true;
+      
+      if (manualRefresh) {
+        const refreshBtn = document.getElementById('refreshBtn');
+        refreshBtn.classList.add('rotating');
+      }
+      
+      // Update status to fetching
+      document.getElementById('statusIndicator').classList.remove('active');
+      document.getElementById('statusText').textContent = 'Fetching logs...';
+      
+      fetch('/tail?log=' + currentLog)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return res.json();
+        })
+        .then(data => {
+          const logBox = document.getElementById('log');
+          logBox.innerHTML = formatLogContent(data);
+          logBox.scrollTop = logBox.scrollHeight;
+          
+          // Update status
+          document.getElementById('statusIndicator').classList.add('active');
+          document.getElementById('statusText').textContent = 'Connected';
+          
+          // Update last updated time
+          lastUpdated = new Date();
+          document.getElementById('updateStatus').textContent = 'Updated just now';
+          
+          // Remove rotating class if it was a manual refresh
+          if (manualRefresh) {
+            const refreshBtn = document.getElementById('refreshBtn');
+            setTimeout(() => {
+              refreshBtn.classList.remove('rotating');
+            }, 500);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching logs:', error);
+          document.getElementById('statusIndicator').classList.remove('active');
+          document.getElementById('statusText').textContent = 'Connection error';
+          document.getElementById('updateStatus').textContent = 'Update failed';
+          
+          if (manualRefresh) {
+            const refreshBtn = document.getElementById('refreshBtn');
+            refreshBtn.classList.remove('rotating');
+          }
+        })
+        .finally(() => {
+          isFetching = false;
+        });
+    }
+    
+    // Update "updated" text over time
+    setInterval(() => {
+      const now = new Date();
+      const diffSeconds = Math.floor((now - lastUpdated) / 1000);
+      
+      if (diffSeconds < 60) {
+        document.getElementById('updateStatus').textContent = 'Updated just now';
+      } else if (diffSeconds < 120) {
+        document.getElementById('updateStatus').textContent = 'Updated a minute ago';
+      } else {
+        const minutes = Math.floor(diffSeconds / 60);
+        document.getElementById('updateStatus').textContent = `Updated ${minutes} minutes ago`;
+      }
+    }, 30000);
+    
+    // Set up log links
+    document.querySelectorAll('.log-link').forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        
+        // Update active state
+        document.querySelectorAll('.log-link').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Update current log
+        currentLog = this.getAttribute('data-log');
+        
+        // Update title with appropriate icon
+        const logTitle = document.getElementById('logTitle');
+        const icon = this.querySelector('i').outerHTML;
+        logTitle.innerHTML = `${icon}Viewing: Log ${currentLog.charAt(0).toUpperCase() + currentLog.slice(1)}`;
+        
+        // Fetch logs for the selected category
+        fetchLogs();
+      });
+    });
+    
+    // Manual refresh button
+    document.getElementById('refreshBtn').addEventListener('click', function() {
+      fetchLogs(true);
+    });
+    
+    // Auto refresh logs every 10 seconds
+    setInterval(() => fetchLogs(), 10000);
+    
+    // Initial fetch
+    fetchLogs();
+  </script>
+</body>
+</html>

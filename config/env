@@ -1,0 +1,116 @@
+# =========================================================
+#                 GENERAL CONFIGURATION LOGGER
+# =========================================================
+
+# Application Ports
+PORT_NUMBER_APP="5019"
+PORT_NUMBER_LOG="3001"
+
+
+# Timezone
+TIMEZONE="Asia/Jakarta"
+
+
+# =====================================================
+#                 DATABASE CONFIGURATION
+# =====================================================
+
+DB_HOST="127.0.0.1"
+DB_PORT="3306"
+DB_NAME="logger"
+DB_USER="root"
+DB_PASSWORD="**aqli**"
+
+
+# =====================================================
+#                 SENSOR DEVICES
+# =====================================================
+
+# --- Sensor AT500 ---
+AT500_STATUS="active"             # Options: active / inactive
+AT500_PORT="/dev/ttyAMA5"
+
+# --- Sensor RT200 ---
+RT200_STATUS="inactive"             # Options: active / inactive
+RT200_PORT="/dev/ttyAMA4"
+
+# --- Sensor SEM5096 ---
+SEM5096_STATUS="inactive"           # Options: active / inactive
+SEM5096_PORT="/dev/ttyAMA6"
+
+# --- Sensor MACE ---
+MACE_STATUS="active"              # Options: active / inactive
+MACE_PORT="/dev/ttyAMA3"
+
+# --- Sensor SPECTRO ---
+SPECTRO_STATUS="active"           # Options: active / inactive
+SPECTRO_IP="192.168.1.100"
+SPECTRO_PORT="502"
+
+# --- Sensor Interval ---
+DELAY="2"                           # Delay pembacaan (detik)
+
+# =====================================================
+#                 KLHK API CONFIGURATION
+# =====================================================
+
+KLHK_STATUS="inactive"              # Options: active / inactive
+KLHK_API_URL="https://sparing.kemenlh.go.id/api/send-hourly"
+KLHK_TOKEN_URL="https://sparing.kemenlh.go.id/api/secret-sensor"
+KLHK_UID="y5655446NH6WE"
+
+KLHK_FIELDS="datetime,pH,tss,cod,nh3n,flow"   # Parameter yang dikirim
+KLHK_MAX_DUP_RETRY="3"                        # Maks percobaan kirim ulang data duplikat
+KLHK_TARGET_MINUTE="5"                        # Target menit kirim ulang
+
+
+# =====================================================
+#                 SENSOR METADATA
+# =====================================================
+#Satuan Default:
+SATUAN_PH="pH"
+SATUAN_COD="mg/L"
+SATUAN_TSS="mg/L"
+SATUAN_NH3N="mg/L"
+SATUAN_FLOW="L/detik"
+SATUAN_TEMP="°C"
+SATUAN_ORP="mV"
+SATUAN_TURB="NTU"
+SATUAN_TDS="ppm"
+SATUAN_CONDUCT="µS/cm"
+SATUAN_DO="mg/L"
+SATUAN_SALINITY="ppt"
+SATUAN_BATTERY="V"
+SATUAN_DEPTH="m"
+SATUAN_TFLOW="L"
+SATUAN_NO3="mg/L"
+SATUAN_BOD="mg/L"
+SATUAN_PRESS="mbar"
+SATUAN_HUM="%"
+SATUAN_WSPEED="m/s"
+SATUAN_WDIR="°"
+SATUAN_RAIN="mm"
+SATUAN_SRAD="W/m2"
+
+
+# Daftar Parameter yang tersedia
+# "pH,cod,tss,nh3n,flow,temp,orp,turb,tds,conduct,do,salinity,battery,depth,tflow,no3,bod,press,hum,wspeed,wdir,rain,srad"
+
+# Parameter yang ditampilkan di dashboard
+PARAMETERS="pH,cod,tss,nh3n,flow,temp,orp,turb,tds,conduct,do,salinity,battery,depth,tflow,no3,bod,press,hum,wspeed,wdir,rain,srad"
+
+# Deteksi Gap data web (menit) jika tidak ada sensor maka akan dibuat terputus, GAP_WEB adaalah penambahan 1 menit dari delay 
+GAP_WEB="3"
+
+WEB_TITLE="Logger Dashboard"
+WEB_NAME="Logger Analyzer System"
+
+DEVICE_ID="HSP-2505X001"
+LOCATION_NAME="PT. aqli"
+
+SOFTWARE_VERSION="1.0.0"
+GEO_LATITUDE="-6.48"
+GEO_LONGITUDE="106.84"
+
+
+

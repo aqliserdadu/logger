@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="title-name">logger Dashboard</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/png" href="/images/logo.png" />
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- JS Libraries -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Tambahkan ke head -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    
+    
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="header-left">
+                <img src="/images/logo.png" alt="HAS Logo" class="logo" />
+            </div>
+            <div class="header-center">
+                <h1 id="header-name">Smart Portable Analyzer System</h1>
+            </div>
+            <div class="header-right">
+                <div class="location-info">
+                    <i class="bi bi-geo-alt"></i>
+                    <span id="map-location">Pt smart media</span>
+                </div>
+                <div class="wifi-button-container">
+                    <button id="wifi-icon-btn" class="wifi-button" data-bs-toggle="modal" data-bs-target="#wifiModal" title="Pilih Jaringan WiFi">
+                        <i class="bi bi-wifi"></i>
+                        <span class="wifi-indicator" id="wifi-status-dot"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Cards -->
+        <div class="card-windrose-wrapper">
+            <div class="cards-grid">
+                <!-- PH -->
+                <div class="card" id="pH-card">
+                    <span class="label">pH</span>
+                    <span id="ph-value" class="value">-</span>
+                    <span id="ph-unit" class="unit"></span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- ORP -->
+                <div class="card" id="orp-card">
+                    <span class="label">ORP</span>
+                    <span id="orp-value" class="value">-</span>
+                    <span id="orp-unit" class="unit">mV</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- TDS -->
+                <div class="card" id="tds-card">
+                    <span class="label">TDS</span>
+                    <span id="tds-value" class="value">-</span>
+                    <span id="tds-unit" class="unit">ppm</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- Conductivity -->
+                <div class="card" id="conduct-card">
+                    <span class="label">Conductivity</span>
+                    <span id="conduct-value" class="value">-</span>
+                    <span id="conduct-unit" class="unit">µS/cm</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- DO -->
+                <div class="card" id="do-card">
+                    <span class="label">Dis. Oxygen</span>
+                    <span id="do-value" class="value">-</span>
+                    <span id="do-unit" class="unit">mg/L</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- Salinity -->
+                <div class="card" id="salinity-card">
+                    <span class="label">Salinity</span>
+                    <span id="salinity-value" class="value">-</span>
+                    <span id="salinity-unit" class="unit">ppt</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- NH3N -->
+                <div class="card" id="nh3n-card">
+                    <span class="label">Ammonia</span>
+                    <span id="nh3n-value" class="value">-</span>
+                    <span id="nh3n-unit" class="unit">mg/L</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- TRUB -->
+                <div class="card" id="turb-card">
+                    <span class="label">Turbidity</span>
+                    <span id="turb-value" class="value">-</span>
+                    <span id="turb-unit" class="unit">NTU</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- TSS -->
+                <div class="card" id="tss-card">
+                    <span class="label">TSS</span>
+                    <span id="tss-value" class="value">-</span>
+                    <span id="tss-unit" class="unit">mg/L</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- COD -->
+                <div class="card" id="cod-card">
+                    <span class="label">COD</span>
+                    <span id="cod-value" class="value">-</span>
+                    <span id="cod-unit" class="unit">mg/L</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- BOD -->
+                <div class="card" id="bod-card">
+                    <span class="label">BOD</span>
+                    <span id="bod-value" class="value">-</span>
+                    <span id="bod-unit" class="unit">mg/L</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- NO3 -->
+                <div class="card" id="no3-card">
+                    <span class="label">Nitrate</span>
+                    <span id="no3-value" class="value">-</span>
+                    <span id="no3-unit" class="unit">mg/L</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- Temperature -->
+                <div class="card" id="temp-card">
+                    <span class="label">Temperature</span>
+                    <span id="temp-value" class="value">-</span>
+                    <span id="temp-unit" class="unit">°C</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- Pressure -->
+                <div class="card" id="press-card">
+                    <span class="label">Pressure</span>
+                    <span id="press-value" class="value">-</span>
+                    <span id="press-unit" class="unit">mbar</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- Battery --->
+                <div class="card" id="battery-card">
+                    <span class="label">Battery</span>
+                    <span id="battery-value" class="value">-</span>
+                    <span id="battery-unit" class="unit">V</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- Depth --->
+                <div class="card" id="depth-card">
+                    <span class="label">Depth</span>
+                    <span id="depth-value" class="value">-</span>
+                    <span id="depth-unit" class="unit">m</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- Flow --->
+                <div class="card" id="flow-card">
+                    <span class="label">Flow</span>
+                    <span id="flow-value" class="value">-</span>
+                    <span id="flow-unit" class="unit">m³/s</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- Total Flow --->
+                <div class="card" id="tflow-card">
+                    <span class="label">Total Flow</span>
+                    <span id="tflow-value" class="value">-</span>
+                    <span id="tflow-unit" class="unit">m³</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- Humidity --->
+                <div class="card" id="hum-card">
+                    <span class="label">Humidity</span>
+                    <span id="hum-value" class="value">-</span>
+                    <span id="hum-unit" class="unit">%</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- Wspeed --->
+                <div class="card" id="wspeed-card">
+                    <span class="label">Wind Speed</span>
+                    <span id="wspeed-value" class="value">-</span>
+                    <span id="wspeed-unit" class="unit">m/s</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- Wdir --->
+                <div class="card" id="wdir-card">
+                    <span class="label">Wind Direction</span>
+                    <span id="wdir-value" class="value">-</span>
+                    <span id="wdir-unit" class="unit">°</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- Rainfall --->
+                <div class="card" id="rain-card">
+                    <span class="label">Rainfall</span>
+                    <span id="rain-value" class="value">-</span>
+                    <span id="rain-unit" class="unit">mm</span>
+                    <span class="timestamp">-</span>
+                </div>
+                <!-- Solar Radiation --->
+                <div class="card" id="srad-card">
+                    <span class="label">Solar Radiation</span>
+                    <span id="srad-value" class="value">-</span>
+                    <span id="srad-unit" class="unit">W/m²</span>
+                    <span class="timestamp">-</span>
+                </div>
+            </div>
+            <div class="windrose-box" id="windRoseChart"></div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="controls">
+            <div class="control-group">
+                <label for="param-select">Pilih Parameter:</label>
+                <select id="param-select" class="form-select"></select>
+            </div>
+            <div class="control-group">
+                <label for="time-range">Rentang Waktu:</label>
+                <select id="time-range" class="form-select">
+                    <option value="realtime">Realtime (15 Menit)</option>
+                    <option value="1h">1 Jam</option>
+                    <option value="12h">12 Jam</option>
+                    <option value="1d">1 Hari</option>
+                    <option value="3d">3 Hari</option>
+                    <option value="7d">7 Hari</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Chart & Map -->
+        <div class="chart-map-wrapper">
+            <div class="chart-container">
+                <div id="dataChart"></div>
+            </div>
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
+        </div>
+
+        <!-- Export & Control -->
+        <div class="export-control-container">
+            <div class="datetime-controls">
+                <div class="datetime-group">
+                    <label for="start-datetime" class="form-label">Start:</label>
+                    <input type="datetime-local" class="form-control" id="start-datetime" step="any">
+                </div>
+                <div class="datetime-group">
+                    <label for="end-datetime" class="form-label">End:</label>
+                    <input type="datetime-local" class="form-control" id="end-datetime" step="any">
+                </div>
+            </div>
+            
+            <div class="export-controls">
+                <div class="export-group">
+                    <label for="export-destination" class="form-label">Export to:</label>
+                    <select id="export-destination" class="form-select">
+                        <option value="download">Download</option>
+                    </select>
+                </div>
+                <div class="export-button">
+                    <button id="export-btn" class="btn btn-success w-100"> 
+                        <i class="bi bi-download"></i>
+                        <span>Export Data</span>
+                    </button>
+                </div>
+                <div class="export-status">
+                    <div id="export-status" class="form-text mt-1"></div>
+                </div>
+            </div>
+            
+            <!-- Tombol restart dan shutdown di bawah export -->
+            <div class="device-controls">
+                <button id="restart-btn" class="device-control-btn restart-btn" title="Restart Device">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span class="btn-text">Restart</span>
+                </button>
+                <button id="shutdown-btn" class="device-control-btn shutdown-btn" title="Shutdown Device">
+                    <i class="bi bi-power"></i>
+                    <span class="btn-text">Shutdown</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- WiFi Modal -->
+    <div class="modal fade" id="wifiModal" tabindex="-1" aria-labelledby="wifiModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="wifi-form">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="wifiModalLabel">Pilih Jaringan WiFi</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info p-2" id="wifi-current-status">Status: Memeriksa...</div>
+                        <div class="mb-3">
+                            <label for="ssid" class="form-label">SSID</label>
+                            <select class="form-select" id="ssid" required>
+                                <option>Memuat...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="wifi-password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="wifi-password" placeholder="Password (jika perlu)" />
+                        </div>
+                        <div id="wifi-status" class="text-muted small"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Hubungkan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="dashboard-footer">
+        <div class="footer-section left">
+            <i class="bi bi-cpu"></i>
+            <span id="footer-device">Device: -</span>
+        </div>
+        <div class="footer-section center">
+            <i class="bi bi-c-circle"></i>
+            <span id="footer-copy">Copyright © 2025 Has Environmental</span>
+        </div>
+        <div class="footer-section right">
+            <i class="bi bi-tag"></i>
+            <span id="footer-version">V: -</span>
+        </div>
+    </footer>
+
+    <script src="/js/script.js"></script>
+    <script>
+        flatpickr("#start-datetime", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            time_24hr: true,
+            defaultDate: new Date(),
+        });
+        flatpickr("#end-datetime", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            time_24hr: true,
+            defaultDate: new Date(),
+        });
+    </script>
+</body>
+</html>
