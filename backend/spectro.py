@@ -50,7 +50,7 @@ def read_modbus_tcp():
         print("Menghubungkan ke sensor Modbus TCP...")
 
         ip = IP    # IP sensor
-        port = PORT
+        port = int(PORT)
         unit_id = 0xFF          # Slave ID sensor
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
