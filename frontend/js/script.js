@@ -115,8 +115,8 @@ async function updateLatestData() {
         });
 
         // Update timestamp di semua kartu
-        if (data.datetime_str) {
-            const formatted = data.datetime_str.replace(' ', ' | ');
+        if (data.date_str) {
+            const formatted = data.date_str.replace(' ', ' | ');
             document.querySelectorAll('.timestamp').forEach(el => el.textContent = formatted);
         }
 
