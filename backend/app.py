@@ -248,6 +248,56 @@ def history_data():
         return jsonify({"timestamps": [], "values": [], "error": str(e)}), 500
 
 
+@app.route('/api/windrose')
+def windrose_data():
+    range_time = request.args.get('range', 'realtime')
+    now = datetime.now()
+    start_time = {
+        "realtime": now - timedelta(minutes=15),
+        "1h": now - timedelta(hours=1),
+        "12h": now - timedelta(hours=12),
+        "1d": now - timedelta(days=1),
+        "3d": now - timedelta(days=3),
+        "7d": now - timedelta(days=7)
+    }.get(range_time, now - timedelta(minutes=15))
+
+    try:
+        
+        query = f"""
+            SELECT date, wspeed, wdir
+            FROM (
+                SELECT date,  wspeed, wdir FROM data
+                UNION ALL
+                SELECT date,  wspeed, wdir FROM tmp
+            ) AS combined
+            WHERE date >= %s
+            ORDER BY date ASC;
+        """
+        df = query_to_dataframe(query, (start_time,))
+
+        # Ganti NaN dengan None agar JSON valid
+        df.fillna(value=pd.NA, inplace=True)
+        df = df.astype(object).where(pd.notnull(df), None)
+
+        if "wspeed" not in df.columns or "wdir" not in df.columns:
+            return jsonify({"timestamps": [], "wspeed": [], "wdir": []})
+
+        return jsonify({
+            "timestamps": df["date"].astype(str).tolist(),
+            "wspeed": df["wspeed"].tolist(),
+            "wdir": df["wdir"].tolist()
+        })
+
+    except Exception as e:
+        logging.error("❌ /api/windrose error: %s", e)
+        traceback.print_exc()
+        return jsonify({"timestamps": [], "wspeed": [], "wdir": [], "error": str(e)}), 500
+
+
+
+
+
+
 @app.route('/api/usb-list')
 def list_usb_devices():
     try:
