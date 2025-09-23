@@ -317,6 +317,7 @@ async function renderHistoryChart() {
 async function updateAllData() {
     await updateLatestData();
     await renderHistoryChart();
+    await renderWindRose();
 }
 
 // --- Event Listeners ---
