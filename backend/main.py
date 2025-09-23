@@ -121,7 +121,7 @@ def main():
                     # Save data if all active sensors were read successfully
                     if status_filter:
                         # Check if any sensor is active
-                        if all(status.lower() != "active" for status in [AT500_STATUS, MACE_STATUS, SPECTRO_STATUS, RT200_STATUS]):
+                        if all(status.lower() != "active" for status in [AT500_STATUS, MACE_STATUS, SPECTRO_STATUS, SEM5096_STATUS, RT200_STATUS]):
                             print(f"[{current_date}] ⚠️ Semua modul sensor tidak aktif. Melewati penyimpanan data.")
                         else:
                             print(f"[{current_date}] ✅ Semua data sensor berhasil terbaca.")
