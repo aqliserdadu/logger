@@ -206,6 +206,9 @@ main {
     border: 1px solid rgba(0,0,0,0.05);
 }
 
+
+
+
 /* Controls Panel */
 .controls {
     background-color: white;
@@ -535,6 +538,14 @@ main {
     .windrose-box {
         flex: 0 0 350px;
     }
+
+    #windRoseChart {
+        max-width: 350px;
+        max-height: 350px;
+        width: 100%;
+        height: auto;
+        overflow: hidden;
+      }
     
     .chart-container, 
     .map-container {
@@ -563,6 +574,16 @@ main {
     .windrose-box {
         flex: 0 0 400px;
     }
+
+    #windRoseChart {
+        max-width: 350px;
+        max-height: auto;
+        width: 100%;
+        height: auto;
+        overflow: hidden;
+    }
+    
+
 }
 
 /* Untuk mobile (kurang dari 768px) */
@@ -599,6 +620,15 @@ main {
     .windrose-box {
         flex: 1 1 100%;
     }
+
+    #windRoseChart {
+        max-width: 350px;
+        max-height: 350px;
+        width: 100%;
+        height: auto;
+        overflow: hidden;
+      }
+    
     
     .card-windrose-wrapper {
         flex-direction: column;
@@ -699,6 +729,15 @@ main {
     .device-control-btn i {
         font-size: 20px;
     }
+
+    #windRoseChart {
+        max-width: 250px;
+        max-height: 250px;
+        width: 100%;
+        height: auto;
+        overflow: hidden;
+      }
+    
     
     /* PERBAIKAN TAMBAHAN UNTUK MAPS DI LAYAR SANGAT KECIL */
     .chart-container,
