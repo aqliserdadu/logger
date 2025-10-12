@@ -13,12 +13,13 @@ LOG_FILES = {
     'sensor': '/opt/logger/logs/sensor.log',
     'send': '/opt/logger/logs/send.log',
     'retry': '/opt/logger/logs/retry.log',
-    'backup': '/opt/logger/logs/backup.log'
+    'backup': '/opt/logger/logs/backup.log',
+    'gpio': '/opt/logger/logs/gpio.log',
+    'has': '/opt/logger/logs/has-send.log'
 }
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FRONTEND_DIR = os.path.join(BASE_DIR, "../frontend")
-
 
 PORT_NUMBER_LOG = int(os.getenv('PORT_NUMBER_LOG', '3000'))
 
@@ -27,7 +28,6 @@ app = Flask(__name__, static_folder=None)
 @app.route("/")
 def index():
     return send_from_directory(FRONTEND_DIR, "log.html")
-
 
 @app.route("/<path:filename>")
 def serve_frontend_assets(filename):
@@ -41,9 +41,18 @@ def tail_log():
     if not filepath or not os.path.exists(filepath):
         return jsonify(["Invalid or missing log file."])
 
+    # Baca semua baris
     with open(filepath, 'r') as f:
-        lines = f.readlines()[-500:]  # ambil 500 baris terakhir
-    return jsonify(lines)
+        lines = f.readlines()
+
+    # Ambil hanya 500 baris terakhir
+    last_lines = lines[-500:]
+
+    # Hapus isi lama dan tulis ulang hanya 500 baris terakhir
+    with open(filepath, 'w') as f:
+        f.writelines(last_lines)
+
+    return jsonify(last_lines)
 
 @app.route('/loglist')
 def get_log_list():

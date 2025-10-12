@@ -8,6 +8,7 @@ from sem5096 import get_sem5096_data
 from config import insert_data, ambilDate, ambilDateTime
 from datetime import datetime
 from dotenv import load_dotenv
+import sqlite3
 import pytz
 
 # Load environment variables
@@ -23,11 +24,81 @@ MACE_STATUS = os.getenv('MACE_STATUS')
 SPECTRO_STATUS = os.getenv('SPECTRO_STATUS')
 RT200_STATUS = os.getenv('RT200_STATUS')
 SEM5096_STATUS = os.getenv('SEM5096_STATUS')
+ARG314_STATUS = os.getenv('ARG314_STATUS')
+
+
+# SQLite Database GPIO
+DB_PATH = os.getenv("SQLITE_DB_PATH", "/opt/logger/data/gpio_logger.db")
+
+def connect_db():
+    """Membuka koneksi ke database SQLite."""
+    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+    return sqlite3.connect(DB_PATH)
+
+
+def get_sensor_gpio(current_date, sensor, auto_delete=True):
+    """
+    Mengambil data terbaru dari tabel gpio berdasarkan nama sensor dan datetime tertentu.
+    
+    Argumen:
+        sensor (str): nama sensor, misalnya 'rain_sensor'
+        current_date (str): waktu dalam format 'YYYY-MM-DD HH:MM:SS'
+        auto_delete (bool): jika True, hapus data lama di tanggal yang sama setelah dibaca.
+        
+    Return:
+        float | None: nilai sensor terbaru pada tanggal yang sama, atau None jika tidak ada data.
+    """
+    
+    try:
+        conn = connect_db()
+        cursor = conn.cursor()
+
+        # Ambil data terbaru di tanggal yang sama dengan current_date
+        cursor.execute("""
+            SELECT id, `date`, nilai 
+            FROM gpio
+            WHERE sensor = ?
+              AND `date` = ?
+            ORDER BY `date` DESC
+            LIMIT 1;
+        """, (sensor, current_date))
+        result = cursor.fetchone()
+ 
+        if result:
+            latest_id, latest_date, nilai = result
+
+            if auto_delete:
+                # Hapus semua data ketika data sudah diambil
+                cursor.execute("""
+                    DELETE FROM gpio
+                    WHERE sensor = ?
+                      AND `date` <= ?
+                """, (sensor, current_date))
+                conn.commit()
+                print(f"[GPIO] 🔄 Hapus data lama sensor '{sensor}' ")
+
+            print(f"[GPIO] ✅ Data terbaru sensor '{sensor}' untuk {latest_date}: {nilai}")
+            return nilai
+        else:
+            print(f"[GPIO] ⚠️ Tidak ada data sensor '{sensor}' untuk tanggal {current_date}")
+            return None
+
+    except Exception as e:
+        print(f"[ERROR] Gagal mengambil data dari database: {e}")
+        return None
+
+    finally:
+        if 'cursor' in locals(): cursor.close()
+        if 'conn' in locals(): conn.close()
+
+
 
 def should_run():
     """Check if the script should run based on the current time and DELAY setting."""
     now = datetime.now()
     return now.minute % DELAY == 0 and now.second == 0
+
+
 
 def main():
     current_date = ambilDate()
@@ -117,11 +188,17 @@ def main():
                             status_filter = False
                             print(f"[{current_date}] ⚠️ Gagal membaca data Modbus TCP.")
                     
+                    # === GPIO Sensors ARG314 ===
+                    if ARG314_STATUS.lower() == "active":
+                        time.sleep(4)   #jika GPIO aktif delay 4 detik agar tidak bentrok saat pengambilan data
+                        data = get_sensor_gpio(current_date,"rain_sensor")
+                        rain = data if data is not None else rain
+                        
                     
                     # Save data if all active sensors were read successfully
                     if status_filter:
                         # Check if any sensor is active
-                        if all(status.lower() != "active" for status in [AT500_STATUS, MACE_STATUS, SPECTRO_STATUS, SEM5096_STATUS, RT200_STATUS]):
+                        if all(status.lower() != "active" for status in [AT500_STATUS, MACE_STATUS, SPECTRO_STATUS, SEM5096_STATUS, RT200_STATUS, ARG314_STATUS]):
                             print(f"[{current_date}] ⚠️ Semua modul sensor tidak aktif. Melewati penyimpanan data.")
                         else:
                             print(f"[{current_date}] ✅ Semua data sensor berhasil terbaca.")

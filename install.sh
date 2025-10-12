@@ -55,7 +55,7 @@ echo "============================================"
 echo "📌 Dibuat oleh        : Abu Bakar <abubakar.it.dev@gmail.com>"
 echo "📌 Deskripsi          : Sistem pemantauan cuaca dan kualitas udara otomatis berbasis Python & API"
 echo "📌 Lokasi Instalasi   : /opt/logger"
-echo "📌 Service            : logger-sensor, logger-web, logger-backup, logger-klhk-send, logger-klhk-retry"
+echo "📌 Service            : logger-sensor, logger-web, logger-backup, logger-gpio, logger-klhk-send, logger-klhk-retry, logger-has-send"
 echo "📌 Web Port           : 0.0.0.0:$WEB_PORT"
 echo "📌 Web Log Port       : 0.0.0.0:$LOG_PORT"
 echo "📌 PhpMyAdmin         : 0.0.0.0:8080"
@@ -175,7 +175,7 @@ if ! docker ps -a --format '{{.Names}}' | grep -q "^db_logger$"; then
         -it aqliserdadu/db:logger
     
     echo "📦 Menginstall MySQL client..."
-    sudo apt-get update -qq && sudo apt-get install -y mariadb-client
+    sudo apt-get update -qq && sudo apt-get install -y mariadb-client python3-rpi.gpio python3-dotenv
     echo "✅ Container database dan MySQL client siap."
 else
     echo "ℹ️  Container db_logger sudah ada. Melewati pembuatan."
@@ -184,6 +184,36 @@ echo ""
 
 # === Buat Systemd Service Files ===
 echo "🔧 Membuat service systemd..."
+
+# === GPIO ARG314 Setup ===
+echo "  • Membuat GPIO.service..."
+cat <<EOF > "/etc/systemd/system/logger-gpio.service"
+[Unit]
+Description=logger GPIO Service
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/logger/backend
+ExecStart=python3 -u  /opt/logger/backend/arg314.py
+StandardOutput=append:/opt/logger/logs/gpio.log
+StandardError=append:/opt/logger/logs/gpio.log
+Restart=always
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable logger-gpio
+systemctl restart logger-gpio
+echo "✅ logger-gpio.service aktif."
+
+
+#==== End GPIO ====
+
 declare -A SERVICE_MAP
 SERVICE_MAP[logger-sensor]="backend/main.py sensor.log"
 SERVICE_MAP[logger-web]="backend/app.py web.log"
@@ -191,6 +221,7 @@ SERVICE_MAP[logger-web-log]="backend/log.py log.log"
 SERVICE_MAP[logger-backup]="backend/backup.py backup.log"
 SERVICE_MAP[logger-klhk-send]="klhk/send.py send.log"
 SERVICE_MAP[logger-klhk-retry]="klhk/retry.py retry.log"
+SERVICE_MAP[logger-has-send]="backend/hasSend.py has-send.log"
 
 for service in "${!SERVICE_MAP[@]}"; do
     IFS=" " read -r script log <<< "${SERVICE_MAP[$service]}"

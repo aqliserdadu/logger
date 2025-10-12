@@ -18,8 +18,8 @@ TIMEZONE="Asia/Jakarta"
 DB_HOST="127.0.0.1"
 DB_PORT="3306"
 DB_NAME="logger"
-DB_USER="root"
-DB_PASSWORD="**aqli**"
+DB_USER="project"
+DB_PASSWORD="**project**"
 
 
 # =====================================================
@@ -27,7 +27,7 @@ DB_PASSWORD="**aqli**"
 # =====================================================
 
 # --- Sensor AT500 ---
-AT500_STATUS="active"             # Options: active / inactive
+AT500_STATUS="inactive"             # Options: active / inactive
 AT500_PORT="/dev/ttyAMA5"
 
 # --- Sensor RT200 ---
@@ -39,16 +39,25 @@ SEM5096_STATUS="inactive"           # Options: active / inactive
 SEM5096_PORT="/dev/ttyAMA6"
 
 # --- Sensor MACE ---
-MACE_STATUS="active"              # Options: active / inactive
+MACE_STATUS="inactive"              # Options: active / inactive
 MACE_PORT="/dev/ttyAMA3"
 
 # --- Sensor SPECTRO ---
-SPECTRO_STATUS="active"           # Options: active / inactive
+SPECTRO_STATUS="inactive"           # Options: active / inactive
 SPECTRO_IP="192.168.1.100"
 SPECTRO_PORT="502"
 
+
+# --- Sensor GPIO ARG314 ---
+ARG314_STATUS="active"            # Options: active / inactive
+RAIN_SENSOR_PIN="18"       # BCM pin untuk sensor tipping bucket
+RESOLUTION="0.202"          # mm per tipping
+DEBOUNCE_MS="200"           # debounce dalam milidetik
+DEMO_MODE="active"         # Options: active / inactive (jika active maka data curah hujan random)
+
+
 # --- Sensor Interval ---
-DELAY="2"                           # Delay pembacaan (detik)
+DELAY="1"                           # Delay pembacaan (menit)
 
 # =====================================================
 #                 KLHK API CONFIGURATION
@@ -62,6 +71,19 @@ KLHK_UID="y5655446NH6WE"
 KLHK_FIELDS="datetime,pH,tss,cod,nh3n,flow"   # Parameter yang dikirim
 KLHK_MAX_DUP_RETRY="3"                        # Maks percobaan kirim ulang data duplikat
 KLHK_TARGET_MINUTE="5"                        # Target menit kirim ulang
+
+
+
+# =====================================================
+#                 HAS API CONFIGURATION
+# =====================================================
+
+HAS_STATUS="inactive"              # Options: active / inactive
+HAS_API_URL="https://sparing.kemenlh.go.id/api/send-hourly"
+HAS_TOKEN="https://sparing.kemenlh.go.id/api/secret-sensor"
+
+
+
 
 
 # =====================================================
@@ -97,7 +119,7 @@ SATUAN_SRAD="W/m2"
 # "pH,cod,tss,nh3n,flow,temp,orp,turb,tds,conduct,do,salinity,battery,depth,tflow,no3,bod,press,hum,wspeed,wdir,rain,srad"
 
 # Parameter yang ditampilkan di dashboard
-PARAMETERS="pH,cod,tss,nh3n,flow,temp,orp,turb,tds,conduct,do,salinity,battery,depth,tflow,no3,bod,press,hum,wspeed,wdir,rain,srad"
+PARAMETERS="rain"
 
 # Deteksi Gap data web (menit) jika tidak ada sensor maka akan dibuat terputus, GAP_WEB adaalah penambahan 1 menit dari delay 
 GAP_WEB="3"

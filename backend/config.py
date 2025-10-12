@@ -81,7 +81,8 @@ def cekTable():
                 srad FLOAT DEFAULT 0,
                 status TEXT,
                 keterangan TEXT,
-                dateterkirim DATETIME
+                dateterkirim DATETIME,
+                has INT DEFAULT 0 
             )
         ''')
         conn.commit()
@@ -117,7 +118,8 @@ def cekTable():
                 srad FLOAT DEFAULT 0,
                 status TEXT,
                 keterangan TEXT,
-                dateterkirim DATETIME
+                dateterkirim DATETIME,
+                has INT DEFAULT 0 
             )
         ''')
         conn.commit()

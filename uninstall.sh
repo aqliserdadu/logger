@@ -18,7 +18,7 @@ echo ""
 set -e  # Hentikan jika terjadi error
 
 APP_BASE="/opt/logger"
-SERVICES=("logger-sensor.service" "logger-web.service" "logger-web-log.service" "logger-backup.service" "logger-klhk-send.service" "logger-klhk-retry.service")
+SERVICES=("logger-sensor.service" "logger-web.service" "logger-web-log.service" "logger-gpio.service" "logger-backup.service" "logger-klhk-send.service" "logger-klhk-retry.service" "logger-has-send.service")
 
 # === Hentikan dan nonaktifkan semua service ===
 echo "🛑 Menghentikan dan menonaktifkan systemd services..."

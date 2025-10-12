@@ -8,3 +8,4 @@ numpy==1.26.4
 pyserial==3.5
 requests==2.31.0
 PyJWT==2.8.0
+RPi.GPIO

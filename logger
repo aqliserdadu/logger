@@ -14,7 +14,7 @@ set -euo pipefail
 trap 'echo "❌ Error pada baris $LINENO. Perintah gagal: $BASH_COMMAND"' ERR
 
 # Konfigurasi
-readonly SERVICES=("logger-sensor.service" "logger-web.service" "logger-web-log.service" "logger-backup.service" "logger-klhk-send.service" "logger-klhk-retry.service")
+readonly SERVICES=("logger-sensor.service" "logger-web.service" "logger-web-log.service" "logger-backup.service" "logger-gpio.service" "logger-klhk-send.service" "logger-klhk-retry.service" "logger-has-send.service")
 readonly LOG_DIR="/opt/logger/logs"
 readonly APP_BASE="/opt/logger"
 readonly BIN_PATH="/usr/bin/logger"

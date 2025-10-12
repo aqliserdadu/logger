@@ -12,7 +12,7 @@ async function initializeDashboard() {
         await updateAllData(); // Lakukan fetch data pertama kali
 
         // Set interval untuk refresh data
-        setInterval(updateAllData, 60000); // Refresh setiap 60 detik
+        setInterval(updateAllData, 30000); // Refresh setiap 30 detik
 
     } catch (e) {
         console.error("Gagal inisialisasi dashboard:", e);
@@ -112,6 +112,11 @@ async function updateLatestData() {
             if (valueEl && typeof data[key] === 'number') {
                 valueEl.textContent = data[key].toFixed(2);
             }
+
+            if (data[key] === null) {
+                valueEl.textContent = 'N/A';
+            }
+
         });
 
         // Update timestamp di semua kartu
@@ -439,7 +444,7 @@ setInterval(() => {
     //fetchHistory(param, range);
     renderHistoryChart(param, range);
     renderWindRose(range);
-}, 60000);
+}, 30000);
 
 
 //wifi deteksi
