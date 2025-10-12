@@ -175,7 +175,7 @@ if ! docker ps -a --format '{{.Names}}' | grep -q "^db_logger$"; then
         -it aqliserdadu/db:logger
     
     echo "📦 Menginstall MySQL client..."
-    sudo apt-get update -qq && sudo apt-get install -y mariadb-client python3-rpi.gpio python3-dotenv
+    sudo apt-get update -qq && sudo apt-get install -y mariadb-client python3-rpi.gpio python3-dotenv python3-lgpio
     echo "✅ Container database dan MySQL client siap."
 else
     echo "ℹ️  Container db_logger sudah ada. Melewati pembuatan."

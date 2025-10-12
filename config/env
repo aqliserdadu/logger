@@ -54,7 +54,7 @@ RAIN_SENSOR_PIN="18"       # BCM pin untuk sensor tipping bucket
 RESOLUTION="0.202"          # mm per tipping
 DEBOUNCE_MS="200"           # debounce dalam milidetik
 DEMO_MODE="active"         # Options: active / inactive (jika active maka data curah hujan random)
-
+GPIO_MODULE="Rpi.GPIO"    # Options: Rpi.GPIO / lgpio
 
 # --- Sensor Interval ---
 DELAY="1"                           # Delay pembacaan (menit)
