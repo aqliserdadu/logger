@@ -176,14 +176,11 @@
       background: #777;
     }
     
-    .refresh-btn {
+    .refresh-btn, .pause-btn {
       position: absolute;
-      bottom: 20px;
-      right: 20px;
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background-color: var(--secondary);
       color: white;
       border: none;
       display: flex;
@@ -195,12 +192,29 @@
       z-index: 10;
     }
     
+    .refresh-btn {
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--secondary);
+    }
+    
+    .pause-btn {
+      bottom: 20px;
+      right: 70px;
+      background-color: #ff9800;
+    }
+    
     .refresh-btn:hover {
       background-color: var(--accent);
       transform: scale(1.1);
     }
     
-    .refresh-btn i {
+    .pause-btn:hover {
+      background-color: #f57c00;
+      transform: scale(1.1);
+    }
+    
+    .refresh-btn i, .pause-btn i {
       font-size: 1.2rem;
     }
     
@@ -243,6 +257,10 @@
       
       .main-content {
         height: auto;
+      }
+      
+      .pause-btn {
+        right: 70px;
       }
     }
   </style>
@@ -306,6 +324,9 @@
         
         <div class="log-container">
           <div id="log"></div>
+          <button class="pause-btn" id="pauseBtn" title="Pause auto refresh">
+            <i class="bi bi-pause"></i>
+          </button>
           <button class="refresh-btn" id="refreshBtn" title="Refresh logs">
             <i class="bi bi-arrow-clockwise"></i>
           </button>
@@ -318,6 +339,8 @@
     let currentLog = 'sensor';
     let isFetching = false;
     let lastUpdated = new Date();
+    let autoRefreshInterval;
+    let isAutoRefreshActive = true;
     
     // Update current time
     function updateTime() {
@@ -401,6 +424,40 @@
         });
     }
     
+    // Function to start auto refresh
+    function startAutoRefresh() {
+      if (!isAutoRefreshActive) {
+        isAutoRefreshActive = true;
+        autoRefreshInterval = setInterval(() => fetchLogs(), 10000);
+        
+        // Update pause button to show pause icon
+        const pauseBtn = document.getElementById('pauseBtn');
+        pauseBtn.innerHTML = '<i class="bi bi-pause"></i>';
+        pauseBtn.title = 'Pause auto refresh';
+        
+        // Update status
+        document.getElementById('statusText').textContent = 'Connected';
+        document.getElementById('statusIndicator').classList.add('active');
+      }
+    }
+    
+    // Function to stop auto refresh
+    function stopAutoRefresh() {
+      if (isAutoRefreshActive) {
+        isAutoRefreshActive = false;
+        clearInterval(autoRefreshInterval);
+        
+        // Update pause button to show play icon
+        const pauseBtn = document.getElementById('pauseBtn');
+        pauseBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
+        pauseBtn.title = 'Resume auto refresh';
+        
+        // Update status
+        document.getElementById('statusText').textContent = 'Paused';
+        document.getElementById('statusIndicator').classList.remove('active');
+      }
+    }
+    
     // Update "updated" text over time
     setInterval(() => {
       const now = new Date();
@@ -443,8 +500,19 @@
       fetchLogs(true);
     });
     
-    // Auto refresh logs every 10 seconds
-    setInterval(() => fetchLogs(), 10000);
+    // Pause/Resume button
+    document.getElementById('pauseBtn').addEventListener('click', function() {
+      if (isAutoRefreshActive) {
+        stopAutoRefresh();
+      } else {
+        startAutoRefresh();
+        // Fetch logs immediately when resuming
+        fetchLogs();
+      }
+    });
+    
+    // Initialize auto refresh
+    startAutoRefresh();
     
     // Initial fetch
     fetchLogs();
